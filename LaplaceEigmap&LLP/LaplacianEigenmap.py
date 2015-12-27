@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 location = os.path.split(os.path.realpath(__file__))[0] + '\\'
-#data_name = 'scroll_data.mat'
-data_name = 'small_scroll_data.mat'
+data_name = 'scroll_data.mat'
+#data_name = 'small_scroll_data.mat'
 origin_fig = 'scroll.png'
 eigmap_fig = 'eigmap.png'
 llp_fig = 'llp.png'
@@ -97,7 +97,7 @@ def get_LLP_eigmap(Lsym, data, k):
     return T
 
 def LLP_low_dim_data(data, LLP_eigmap):
-    low_dim_data = np.mat(data) * LLP_eigmap 
+    low_dim_data = np.mat(data) * LLP_eigmap  
     return np.array(low_dim_data)
 
 def plot_data_2d(data, title = '', save_fig = ''):
@@ -113,9 +113,10 @@ def plot_data_2d(data, title = '', save_fig = ''):
     plt.show()
 
 def plot_data_3d(data, title = '', save_fig = ''):
-    fig = plt.figure()   
-    plt.title(title)
+    fig = plt.figure()       
     ax = fig.add_subplot(111, projection='3d')
+    ax.set_title(title)
+
     T = np.arange(0, 2 * np.pi,  2 * np.pi / len(data))
     ax.scatter(data[:, 0], data[:, 1], data[:, 2], s = 50, c = T)
 
