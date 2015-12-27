@@ -1,5 +1,5 @@
 
-#Laplace Eigmap && Local Linear projetction
+#Laplacian Eigenmap && Locallity Preserving Projection
 拉普拉斯矩阵&&局部线性投影降维
 
 ## 编程环境
