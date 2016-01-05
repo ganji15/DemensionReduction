@@ -2,7 +2,7 @@
 Author: GanJi
 No.201518008629004
 
-Spectral Clustering
+LLE
 '''
 import os
 import scipy.io as sio
@@ -19,7 +19,7 @@ le_fig = 'le.png'
 
 calc_dist = lambda x, y: sum(i * i for i in (x - y))
 
-def k_nearest_neigbor_weights(data, point, k_edge, varance = 10):
+def k_nearest_neigbor_weights(data, point, k_edge):
     dist_index = []
     dists = []
     m = len(data)
@@ -27,30 +27,33 @@ def k_nearest_neigbor_weights(data, point, k_edge, varance = 10):
     for i in range(0, m):
         dists.append(calc_dist(data[i], point))
     dist_index =  np.argsort(dists)[1 : k_edge + 1]
-    weights = [np.exp(- dists[i] * 1.0 / (2 * varance * varance)) for i in dist_index]
-    
-    return dist_index, weights
+   
+    return dist_index
 
-def calc_M(data, k_edge = 10, varance = 10):
+def calc_M(data, k_edge = 10):
     m = len(data)
     W = np.zeros((m, m), dtype = 'float')
     print '[calc_M] begin'
     for i in range(0, m):
         print '%4.2f%%'%(i * 100.0 / m)
-        index, weights =  k_nearest_neigbor_weights(data, data[i], k_edge, varance)
-        sum_weights = sum(weights)
-        for j in range(0, len(index)):
-            W[i, index[j]] = weights[j] / sum_weights
+        index =  k_nearest_neigbor_weights(data, data[i], k_edge)
+        mean_zero = np.mat(data[index, :] - data[i, :])
+        G = mean_zero * mean_zero.T
+        u, s, v = np.linalg.svd(G)
+        r = np.sqrt( sum(s**2))
+        G += np.eye(k_edge) * r
+        Wi = np.linalg.solve(G, np.ones((k_edge, 1), dtype = 'float'))[:,0]
+        Wi = Wi / np.sum(Wi)
+        W[i, index] = Wi
 
     M = np.mat(np.eye(m)) - np.mat(W)
     M = M.T * M
-  
+        
     print '[calc_M] end'
-
-    return M
+    return M  
 
 def get_LE(M, k):
-    print '[LE] begin'
+    print '[LLE] begin'
     eig_values, eig_vecs = np.linalg.eig(M)
     eig_values = eig_values.real
     eig_vecs = eig_vecs.real
@@ -65,7 +68,7 @@ def get_LE(M, k):
             break
 
     T = np.array(np.hstack(T))
-    print '[LE] end'
+    print '[LLE] end'
     return T
 
 def plot_data_2d(data, title = '', save_fig = ''):
@@ -94,7 +97,7 @@ def plot_data_3d(data, title = '', save_fig = ''):
 
 def run():
     scroll_data_3d = sio.loadmat(location + data_name)['data']
-    M = calc_M(scroll_data_3d, 20, 10)
+    M = calc_M(scroll_data_3d, 17)
     low_data = get_LE(M, 2)
     plot_data_3d(scroll_data_3d, 'scroll_data', location + origin_fig)
     plot_data_2d(low_data, 'LE', location + le_fig)
