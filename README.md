@@ -1,5 +1,5 @@
 # DemensionReduction
-最近学习数据降维方法，欢迎大家与我交流。
+数据降维方法
 
 ## 编程环境
 * Python2.7 + Numpy + Scipy + Matplotlib
